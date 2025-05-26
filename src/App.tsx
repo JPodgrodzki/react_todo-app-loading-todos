@@ -4,20 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { UserWarning } from './UserWarning';
 import { USER_ID, getTodos } from './api/todos';
 import { Todo } from './types/Todo';
+import { Filter } from './types/Filter';
+import { Errors } from './types/Errors';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [error, setError] = useState<Errors | null>(null);
+  const [filter, setFilter] = useState<Filter>(Filter.All);
 
   const filteredTodos = todos.filter(todo => {
     switch (filter) {
-      case 'all':
+      case Filter.All:
         return true;
-      case 'active':
+      case Filter.Active:
         return !todo.completed;
-      case 'completed':
+      case Filter.Completed:
         return todo.completed;
     }
   });
@@ -28,7 +30,7 @@ export const App: React.FC = () => {
 
     getTodos()
       .then(setTodos)
-      .catch(() => setError('Unable to load todos'))
+      .catch(() => setError(Errors.Load))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -110,7 +112,7 @@ export const App: React.FC = () => {
               </div>
             );
           })}
-          {isLoading && <p>.................</p>}
+          {isLoading && null}
         </section>
 
         {todos.length > 0 && (
@@ -124,7 +126,7 @@ export const App: React.FC = () => {
                 href="#/"
                 className={`filter__link ${filter === 'all' ? 'selected' : ''}`}
                 data-cy="FilterLinkAll"
-                onClick={() => setFilter('all')}
+                onClick={() => setFilter(Filter.All)}
               >
                 All
               </a>
@@ -133,7 +135,7 @@ export const App: React.FC = () => {
                 href="#/active"
                 className={`filter__link ${filter === 'active' ? 'selected' : ''}`}
                 data-cy="FilterLinkActive"
-                onClick={() => setFilter('active')}
+                onClick={() => setFilter(Filter.Active)}
               >
                 Active
               </a>
@@ -142,7 +144,7 @@ export const App: React.FC = () => {
                 href="#/completed"
                 className={`filter__link ${filter === 'completed' ? 'selected' : ''}`}
                 data-cy="FilterLinkCompleted"
-                onClick={() => setFilter('completed')}
+                onClick={() => setFilter(Filter.Completed)}
               >
                 Completed
               </a>
